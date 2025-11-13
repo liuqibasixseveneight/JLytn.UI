@@ -1,0 +1,48 @@
+---
+description: Document the frontend stack, key dependency versions, and usage tips
+globs:
+alwaysApply: false
+---
+# Application Stack Overview
+
+Track the core runtime and tooling dependencies powering the app and apply the tips below when upgrading or adding features.
+
+## Runtime Dependencies
+
+1. `react@19.2.0` and `react-dom@19.2.0`
+   - Lean on the new `use` hook and transition APIs only after confirming they are stable in your bundler pipeline.
+   - Stick to functional components; React 19 drops implicit support for legacy patterns.
+   - When mixing Suspense with data fetching, wrap boundary fallbacks with error handling since React 19 surfaces async errors synchronously.
+2. `styled-components@6.1.19`
+   - Prefer the `styled` API with typed `DefaultTheme`; keep `styled.d.ts` in sync with theme exports.
+   - Use `StyleSheetManager` for SSR hydration if server-rendering is added later.
+   - Avoid dynamic style strings inside render loops; memoize heavy interpolations.
+3. `zustand@5.0.8`
+   - Favor slices over monolithic stores; TypeScript generics in v5 help infer selectors.
+   - Use the `subscribeWithSelector` middleware to reduce rerenders for derived state.
+   - Persist stores with the built-in `persist` middleware; namespace keys to prevent collisions.
+4. `gsap@3.13.0` and `@gsap/react@2.1.2`
+   - Register plugins once at module scope; double registration throws in React strict mode.
+   - Use the `useGSAP` hook for timeline lifecycles; always clean up to avoid stale animations.
+   - Keep animation state outside React state unless UI needs the values; GSAP timelines manage their own state efficiently.
+
+## Tooling
+
+1. `vite@7.2.2`
+   - Use the config’s `resolve.alias` for clean import paths; keep aliases mirrored in `tsconfig.json`.
+   - Enable `optimizeDeps.include` for large third-party packages if cold-starts spike.
+   - Keep `vite.config.ts` free of CommonJS plugins; Vite 7 expects pure ESM.
+2. `typescript@5.9.3`
+   - Activate `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes` for safer patterns (supported in 5.9).
+   - Use the new `using` declarations cautiously; ensure emitted cleanup works with React event loops.
+   - Regenerate declarations when updating `styled-components` themes to prevent stale types.
+3. `eslint@9.39.1` with `@eslint/js`, `typescript-eslint@8.46.3`, `eslint-plugin-react-hooks@5.2.0`, `eslint-plugin-react-refresh@0.4.24`
+   - Run `eslint --cache` locally; ESLint 9’s flat config expects `eslint.config.js`—avoid mixing with legacy `.eslintrc`.
+   - React 19 strictness pairs with the hooks plugin; keep dependency arrays exact to avoid double-invocation bugs.
+   - React Refresh lint warnings indicate hot-reload mismatches—fix immediately to preserve fast refresh.
+
+## Upgrade Checklist
+
+1. Review release notes for React and Vite in tandem; breaking changes often require config tweaks.
+2. Re-run unit and animation smoke tests after bumping GSAP; timeline internals can change subtly.
+3. Update Cursor rules whenever the dependency stack shifts so automation stays trustworthy.

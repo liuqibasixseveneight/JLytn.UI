@@ -1,0 +1,62 @@
+---
+description: Summary of the JLytn UI directory structure and key artifacts
+globs:
+  - src/**
+  - public/**
+alwaysApply: false
+---
+# Project Structure Overview
+
+Use this map to keep directory usage aligned and avoid scattering new code.
+
+## Root Highlights
+
+1. `src/` — all app code, strongly typed with TypeScript.
+2. `public/` — unprocessed assets (index shell plus bundled font families under `public/fonts`).
+3. `.cursor/rules/` — rule docs (keep filenames kebab-case).
+4. Tooling: `vite.config.ts`, `tsconfig*.json`, `eslint.config.js`, and `package.json` live at the root.
+
+> **Note:** Node tooling lives under `node_modules/`; never edit packages directly.
+
+## `src/` Layout
+
+1. `main.tsx` — Vite entry; loads global styles and wraps `App` in the theme provider from `components/theme`.
+2. `App.tsx` / `App.styles.ts` — application shell; mounts the fixed `HeaderNav` and the `Home` page inside a themed container.
+3. `index.css` — global reset, base typography, and all `@font-face` declarations (Inter, Stack Sans Headline, JetBrains Mono from `public/fonts`).
+4. `assets/` — owned media (currently `react.svg` placeholder).
+5. `types/` — shared declarations; `styled.d.ts` augments the styled-components theme typing.
+
+### Theming
+
+1. `components/theme/theme.ts` — central theme tokens (currently zinc grayscale palette).
+2. `components/theme/index.ts` — barrel export so components can import `theme` and related types from a single place.
+
+### UI Components
+
+1. `components/ui/index.ts` — re-exports the UI tiers.
+2. `components/ui/atoms/` — reserved for future primitives; `index.ts` is a placeholder barrel.
+3. `components/ui/molecules/` — reserved for composed elements; `index.ts` placeholder keeps the structure ready.
+4. `components/ui/organisms/` — production components. `HeaderNav/` holds the fixed top navigation (`HeaderNav.tsx`, styles, types, and barrel).
+
+### Pages
+
+1. `components/pages/index.ts` — barrel for page-level exports.
+2. `components/pages/Home/` — landing view package:
+   - `Home.tsx` — renders the hero surface within the pearlescent background.
+   - `Home.styles.ts` — gradient-heavy background plus layout wrappers.
+   - `types.ts` — props placeholder for future inputs.
+   - `index.ts` — local barrel export.
+
+### Public Assets
+
+1. `public/fonts/Inter/` — Inter variable and static weights (normal + italic) served to the `@font-face` declarations in `src/index.css`.
+2. `public/fonts/StackSansHeadline/` — Stack Sans Headline variable/static weights used for display typography.
+3. `public/fonts/JetBrainsMono/` — JetBrains Mono monospaced family for code snippets and UI chrome.
+4. Add new assets in `public/` and update `index.css` (or dedicated global styles) when exposing additional font faces.
+
+## Adding New Code
+
+1. Place new domain components under the appropriate UI tier.
+2. Add shared utilities in a dedicated `src/utils/` folder when needed.
+3. Extend the placeholder barrels in `components/ui/atoms` and `components/ui/molecules` as new pieces land.
+4. Reflect major structural additions in this rule to keep documentation current.
